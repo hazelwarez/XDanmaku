@@ -5,6 +5,11 @@
 
 # usage: xdanmaku-weechatlog.sh [SERVER [CHANNEL]]
 
+# Pass options and arguments to XDanmaku by setting the XDANMAKU_FLAGS
+# environment variable before running the script:
+#
+#         export XDANMAKU_FLAGS="-bg 262626 -fg ffffff -st 1 -fn Mona:size=32"
+
 # https://weechat.org/
 # https://github.com/weechat/weechat
 # https://weechat.org/files/doc/weechat/stable/weechat_user.en.html#buffer_logging
@@ -38,7 +43,7 @@ elif test -x ../$prog; then bin="../$prog"
 else echo "${0##*/}: $prog: Failed to locate the executable"; exit 1
 fi
 
-tail -n1 -f $logs | while read line; do echo "$line" | cut -f3-; done | $bin
+tail -n1 -f $logs | while read line; do echo "$line" | cut -f3-; done | $bin ${XDANMAKU_FLAGS}
 
 # The while loop appears to be necessary due to `cut' buffering its output.
 # https://stackoverflow.com/a/14362162
