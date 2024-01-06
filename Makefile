@@ -1,11 +1,13 @@
-cc=gcc -lX11 -lXext
+libs=`pkg-config --libs x11 xext xft freetype2`
+cflags=`pkg-config --cflags x11 xext xft freetype2`
+cc=cc $(libs) $(cflags)
 
 default: build
 
 .PHONY: rebuild
 
 build:
-	$(cc) bullet.c list.c xdanmaku.c -o xdanmaku
+	$(cc) main.c xdanmaku.c -o xdanmaku
 
 clean:
 	-rm -f xdanmaku
@@ -16,4 +18,8 @@ rebuild:
 
 run:
 	$(MAKE) rebuild
-	./xdanmaku
+	./xdanmaku $(XDANMAKU_FLAGS)
+
+woto:
+	$(MAKE) rebuild
+	./examples/xdanmaku-weechatlog.sh
