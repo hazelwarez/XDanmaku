@@ -1,0 +1,87 @@
+                 X11 Danmaku for Standard Input Stream
+                ---------------------------------------
+
+To build, clone the git repository and change into the directory.
+From there, use the `make' command:
+
+	make build
+
+The XDanmaku cli utility reads from its standard input (stdin) file
+and will turn every input line provided to it into a danmaku chat
+"bullet" that slides across the screen from right to left.
+
+Example usage in script:
+
+	while true; do echo -e 'I JOE\nYOU JOE\nLALALALA' | shuf -n1; sleep 0.3; done | xdanmaku
+
+For more, see the `examples' directory in the repository.
+
+Various configuration options can be set on the command line or set
+in the environment variable `XDANMAKU_FLAGS' if one of the example
+scripts is being used. For example,
+
+	XDANMAKU_FLAGS="-bg 262626 -st 1 -sn 0.75 -sx 0.90 -fn Mona:size=32"
+
+Sets the background color to #262626, 1 pixel of text stroke, the
+speed to a range from 0.75 to 0.90 subpixels per tick, and the font
+to Mona:size=32.
+
+If the background color is set with -bg but stroke hasn't been specified
+with -st, then the background will be a solid rectangle around the text.
+This also functions as an alternative to the text being cut out with the
+X Shape Extension for any systems on which it leads to poor performance.
+
+The other options can be seen with the -h command line option.
+
+A compositor is likely necessary for the windows to be drawn without
+severely impacting system performance. I suggest these options for
+these common programs:
+
+mpv:
+	--x11-bypass-compositor=never
+	--opengl-swapinterval=0
+	--video-sync-max-factor=1
+
+picom:
+	backend = "glx"
+	vsync = true  # or manually set refresh-rate
+
+The most beneficial change by far has been disabling vsync on MPV and
+letting the compositor take care of it instead.
+
+XDanmaku options -d for stdin polling delay (in microseconds), and
+-sn and -sx for minimum and maximum speed can be tweaked to tailor the
+performance to your system.
+
+This program is way beyond what X11 clients are expected to be doing,
+especially through Xlib, and it should not be taken too seriously.
+
+See also:
+https://github.com/steinuil/sora-no-tools/tree/master/coof
+
+On performance, mpv, external configuration:
+https://wiki.archlinux.org/title/NVIDIA/Troubleshooting#Avoid_screen_tearing
+https://en.wikipedia.org/wiki/Vertical_blanking_interval
+https://mpv.io/manual/master/#options
+https://github.com/yshui/picom
+https://github.com/mpv-player/mpv/
+
+On danmaku:
+https://en.wikipedia.org/wiki/Danmaku_subtitling
+https://w3c.github.io/danmaku/
+https://github.com/OpenDanmakuCommunity/awesome-danmaku
+
+On XShape:
+https://www.x.org/releases/current/doc/man/man3/XShape.3.xhtml
+https://www.xfree86.org/current/shapelib.pdf
+
+On Xft and fonts in X:
+https://keithp.com/~keithp/talks/xtc2001/paper/
+https://keithp.com/~keithp/talks/xtc2001/paper/xft.html#sec-xft-name
+https://keithp.com/~keithp/render/Xft.tutorial
+https://blog.summercat.com/x-fonts-and-rpbar.html
+https://www.cl.cam.ac.uk/~mgk25/ucs-fonts.html
+
+On command line option conventions for X utilities:
+https://www.catb.org/~esr/writings/taoup/html/ch10s05.html#id2948015
+https://tronche.com/gui/x/xlib/resource-manager/parsing-command-line.html
