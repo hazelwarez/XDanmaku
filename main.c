@@ -8,7 +8,7 @@
 #include "xdanmaku.h"
 
 #define NAME "XDanmaku"
-#define VERSION "2024.01.08"
+#define VERSION "2024.03.22"
 #define loop while (true)
 #define STDIN STDIN_FILENO
 #define fail xdanmaku_fail
@@ -177,13 +177,14 @@ int main(int argc, char **argv)
 		else
 			usleep(config.delay);
 
+		int llen = list_len(list);
 		while ((b = list_iter(list)))
 			if (bullet_passed(b))
 				bullet_destroy(list, b);
 			else
 				bullet_tick(b);
 
-		if (list_len(list))
+		if (llen)
 			XFlush(state.dpy);
 	}
 

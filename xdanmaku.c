@@ -312,7 +312,7 @@ void bullet_tick(Bullet *b)
 
 bool bullet_passed(Bullet *b)
 {
-	return b->x - b->speed + b->width <= 0;
+	return b->x < -(float)b->width;
 }
 
 /* ------------------------------------------------------------------ */
