@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <ctype.h>
 
 #include "xdanmaku.h"
 
@@ -256,6 +257,18 @@ void xdrawstr(Bullet *new, char *line, int n)
 
 /* ------------------------------------------------------------------ */
 
+static char *strtrim(char *line)
+{
+	char *end = NULL;
+	while (isspace(*line)) ++line;
+	if (*line == '\0')
+		return NULL;
+	end = line + strlen(line) - 1;
+	while (end > line && isspace(*end)) --end;
+	end[1] = '\0';
+	return line;
+}
+
 Bullet *mkbullet(char *line)
 {
 	if (line == NULL)
@@ -270,8 +283,15 @@ Bullet *mkbullet(char *line)
 	new->x = 0;
 	new->y = 0;
 	new->speed = 1.0;
-	int slen = strlen(line);
-	drawstr[state.drawfn](new, line, slen);
+	char *trimmed = strtrim(line);
+	if (trimmed == NULL) {
+		free(new);
+		return NULL;
+	}
+	if (config.echo)
+		printf("%s\n", trimmed);
+	int slen = strlen(trimmed);
+	drawstr[state.drawfn](new, trimmed, slen);
 	new->speed = randf(config.speed_min, config.speed_max);
 	return new;
 }
@@ -279,7 +299,8 @@ Bullet *mkbullet(char *line)
 void bullet_destroy(List *list, Bullet *b)
 {
 	XDestroyWindow(state.dpy, b->id);
-	list_erase(list, b);
+	if (list)
+		list_erase(list, b);
 	free(b);
 }
 
@@ -313,7 +334,7 @@ List *list_append(List *list, Bullet *bullet)
 {
 	if (bullet == NULL)
 		return NULL;
-	if (list && config.bullet_max > 0 && list_len(list) >= config.bullet_max)
+	if (list && list_full(list))
 		return NULL;
 	if (list == NULL && (list = mklist()) == NULL)
 		return NULL;
@@ -376,4 +397,13 @@ int list_len(List *list)
 	if (list == NULL)
 		return -1;
 	return list->len;
+}
+
+bool list_full(List *list)
+{
+	if (list == NULL)
+		return false;
+	if (config.bullet_max <= 0)
+		return false;
+	return list_len(list) >= config.bullet_max;
 }

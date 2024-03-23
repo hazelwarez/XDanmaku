@@ -3,13 +3,12 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
-#include <ctype.h>
 #include <fcntl.h>
 
 #include "xdanmaku.h"
 
 #define NAME "XDanmaku"
-#define VERSION "2024.01.06"
+#define VERSION "2024.01.08"
 #define loop while (true)
 #define STDIN STDIN_FILENO
 #define fail xdanmaku_fail
@@ -117,19 +116,7 @@ void parseargs(int argc, char **argv)
 				state.prog, config.speed_max, config.speed_min);
 }
 
-char *strtrim(char *line)
-{
-	char *end = NULL;
-	while (isspace(*line)) ++line;
-	if (*line == '\0')
-		return NULL;
-	end = line + strlen(line) - 1;
-	while (end > line && isspace(*end)) --end;
-	end[1] = '\0';
-	return line;
-}
-
-Bullet *getbullet(void)
+char *getbulletstr(void)
 {
 	char *line = NULL;
 	ssize_t nread = 0;
@@ -143,22 +130,13 @@ Bullet *getbullet(void)
 		line[config.line_max-1] = '\0';
 	else
 		line[nread] = '\0';
-	char *trimmed = strtrim(line);
-	if (trimmed == NULL) {
-		free(line);
-		return NULL;
-	}
-	Bullet *new = mkbullet(line);
-	if (config.echo && new)
-		printf("%s\n", trimmed);
-	free(line);
-	return new;
+	return line;
 }
 
-Bullet *pollfds(fd_set *fds)
+char *pollfds(fd_set *fds)
 {
 	if (!feof(stdin) && FD_ISSET(STDIN, fds))
-		return getbullet();
+		return getbulletstr();
 	return NULL;
 }
 
@@ -183,10 +161,22 @@ int main(int argc, char **argv)
 
 	loop {
 		reselect(&fds);
-		if (!feof(stdin))
-			list_append(list, pollfds(&fds));
-		else if (!list_len(list))
+		if (!feof(stdin)) {
+			char *bstr = pollfds(&fds);
+			if (bstr && !list_full(list)) {
+				Bullet *new = mkbullet(bstr);
+				List *ok = list_append(list, new);
+				if (new && !ok)
+					free(new);
+			}
+			if (bstr)
+				free(bstr);
+		}
+		else if (feof(stdin) && !list_len(list))
 			break;
+		else
+			usleep(config.delay);
+
 		while ((b = list_iter(list)))
 			if (bullet_passed(b))
 				bullet_destroy(list, b);

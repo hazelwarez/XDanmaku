@@ -79,3 +79,4 @@ List *list_append(List *list, Bullet *bullet);
 Bullet *list_iter(List *list);
 Bullet *list_erase(List *list, Bullet *bullet);
 int list_len(List *list);
+bool list_full(List *list);
