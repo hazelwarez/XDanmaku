@@ -8,7 +8,7 @@
 #include "xdanmaku.h"
 
 #define NAME "XDanmaku"
-#define VERSION "2024.03.22"
+#define VERSION "2025.01.06"
 #define loop while (true)
 #define STDIN STDIN_FILENO
 #define fail xdanmaku_fail
@@ -26,6 +26,7 @@ void help(void)
 	printf("  -sx  maximum speed, in subpixels, per tick (default: %.2f)\n", config.speed_max);
 	printf("  -lx  maximum line length, in bytes, per bullet (default: %d)\n", config.line_max);
 	printf("  -bx  maximum number of bullets at a time (default: nil)\n");
+	printf("  -bsx maximum number of bullets to be created per second (default: nil)\n");
 	printf("  -e   echo each new input line as it will be drawn (default: false)\n");
 	printf("  -d   delay between stdin polling, in microseconds (default: %d)\n", config.delay);
 	printf("  -h   print this help message and exit\n");
@@ -89,6 +90,9 @@ void parseargs(int argc, char **argv)
 		}
 		elifopt("-bx") {
 			getargint("-bx", config.bullet_max);
+		}
+		elifopt("-bsx") {
+			getargint("-bsx", config.bullet_max_per_second);
 		}
 		elifopt("-fg") {
 			getargcolor("-fg", config.fg_color);

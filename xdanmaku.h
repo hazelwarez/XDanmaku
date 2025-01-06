@@ -17,6 +17,7 @@ extern struct xdanmaku_config {
 	float speed_min;
 	float speed_max;
 	int bullet_max;
+	int bullet_max_per_second;
 	int line_max;
 	int padding_top;
 	int padding_bottom;
@@ -43,6 +44,8 @@ extern struct xdanmaku_state {
 	Visual *vis;
 	int drawfn;
 	XRenderColor mask_fg;
+	time_t this_second;
+	int bullets_created_this_second;
 } state;
 
 struct list {

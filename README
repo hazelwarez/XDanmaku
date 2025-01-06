@@ -51,7 +51,8 @@ letting the compositor take care of it instead.
 
 XDanmaku options -d for stdin polling delay (in microseconds), and
 -sn and -sx for minimum and maximum speed can be tweaked to tailor the
-performance to your system.
+performance to your system. -bsx can be used for extreme cases of lag
+caused by an excessive number of bullets being created every second.
 
 This program is way beyond what X11 clients are expected to be doing,
 especially through Xlib, and it should not be taken too seriously.

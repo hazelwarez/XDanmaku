@@ -23,6 +23,7 @@ struct xdanmaku_config config = {
 	.speed_min = 0.60,
 	.speed_max = 0.75,
 	.bullet_max = 0,
+	.bullet_max_per_second = 0,
 	.line_max = 128,
 	.padding_top = 0,
 	.padding_bottom = 0,
@@ -271,8 +272,24 @@ static char *strtrim(char *line)
 
 Bullet *mkbullet(char *line)
 {
-	if (line == NULL)
+	if (line == NULL || *line == '\0')
 		return NULL;
+	if (config.bullet_max_per_second > 0) {
+		time_t now = time(NULL);
+		if (state.this_second != now) {
+			state.this_second = now;
+			state.bullets_created_this_second = 1;
+		}
+		else {
+			if (++state.bullets_created_this_second >= config.bullet_max_per_second) {
+				if (config.echo)
+					printf("rejected %d; %s\n",
+						(state.bullets_created_this_second-config.bullet_max_per_second)+1,
+						line);
+				return NULL;
+			}
+		}
+	}
 	Bullet *new = malloc(sizeof(Bullet));
 	if (new == NULL)
 		return NULL;
